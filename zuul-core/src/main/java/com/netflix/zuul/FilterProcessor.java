@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
+ * 执行过滤器的核心类
  * This the the core class to execute filters.
  *
  * @author Mikey Cohen
@@ -82,6 +83,7 @@ public class FilterProcessor {
     }
 
     /**
+     * 执行"route"类型过滤器后的后置处理
      * runs "post" filters which are called after "route" filters. ZuulExceptions from ZuulFilters are thrown.
      * Any other Throwables are caught and a ZuulException is thrown out with a 500 status code
      *
@@ -98,6 +100,7 @@ public class FilterProcessor {
     }
 
     /**
+     * 异常处理
      * runs all "error" filters. These are called only if an exception occurs. Exceptions from this are swallowed and logged so as not to bubble up.
      */
     public void error() {
@@ -109,6 +112,7 @@ public class FilterProcessor {
     }
 
     /**
+     * 执行"route"类型的过滤器
      * Runs all "route" filters. These filters route calls to an origin.
      *
      * @throws ZuulException if an exception occurs.
@@ -124,6 +128,7 @@ public class FilterProcessor {
     }
 
     /**
+     * 执行"pre"类型的过滤器
      * runs all "pre" filters. These filters are run before routing to the orgin.
      *
      * @throws ZuulException
@@ -139,6 +144,7 @@ public class FilterProcessor {
     }
 
     /**
+     * 执行某种类型的过滤器
      * runs all filters of the filterType sType/ Use this method within filters to run custom filters by type
      *
      * @param sType the filterType.
@@ -189,11 +195,13 @@ public class FilterProcessor {
                 Debug.addRoutingDebug("Filter " + filter.filterType() + " " + filter.filterOrder() + " " + filterName);
                 copy = ctx.copy();
             }
-            
+
+            // 执行过滤器业务逻辑
             ZuulFilterResult result = filter.runFilter();
             ExecutionStatus s = result.getStatus();
             execTime = System.currentTimeMillis() - ltime;
 
+            // 保存执行结果
             switch (s) {
                 case FAILED:
                     t = result.getException();

@@ -71,6 +71,7 @@ public class ZuulServlet extends HttpServlet {
             context.setZuulEngineRan();
 
             try {
+                // 执行"pre"类型的过滤器
                 preRoute();
             } catch (ZuulException e) {
                 error(e);
@@ -78,6 +79,7 @@ public class ZuulServlet extends HttpServlet {
                 return;
             }
             try {
+                // 执行"route"类型的过滤器
                 route();
             } catch (ZuulException e) {
                 error(e);
@@ -85,6 +87,7 @@ public class ZuulServlet extends HttpServlet {
                 return;
             }
             try {
+                // 执行"post"类型的过滤器
                 postRoute();
             } catch (ZuulException e) {
                 error(e);

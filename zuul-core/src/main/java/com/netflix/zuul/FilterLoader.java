@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * {@link ZuulFilter}加载器
  * This class is one of the core classes in Zuul. It compiles, loads from a File, and checks if source code changed.
  * It also holds ZuulFilters by filterType.
  *
@@ -54,9 +55,16 @@ public class FilterLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilterLoader.class);
 
+    // 缓存Filter名称(主要是从文件加载，名称为绝对路径 + 文件名的形式)->Filter最后修改时间戳的映射
     private final ConcurrentHashMap<String, Long> filterClassLastModified = new ConcurrentHashMap<String, Long>();
+
+    // 缓存Filter名字->Filter代码的映射，实际上这个Map只使用到get方法进行存在性判断，一直是一个空的结构
     private final ConcurrentHashMap<String, String> filterClassCode = new ConcurrentHashMap<String, String>();
+
+    // 缓存Filter名字->Filter名字的映射，用于存在性判断
     private final ConcurrentHashMap<String, String> filterCheck = new ConcurrentHashMap<String, String>();
+
+    // 缓存每种类型对应的ZuulFilter列表
     private final ConcurrentHashMap<String, List<ZuulFilter>> hashFiltersByType = new ConcurrentHashMap<String, List<ZuulFilter>>();
 
     private FilterRegistry filterRegistry = FilterRegistry.instance();
@@ -168,6 +176,7 @@ public class FilterLoader {
     }
 
     /**
+     * 获取类型对应的{@link ZuulFilter}列表
      * Returns a list of filters by the filterType specified
      *
      * @param filterType
@@ -175,18 +184,22 @@ public class FilterLoader {
      */
     public List<ZuulFilter> getFiltersByType(String filterType) {
 
+        // 先从缓存中查询
         List<ZuulFilter> list = hashFiltersByType.get(filterType);
         if (list != null) return list;
 
         list = new ArrayList<ZuulFilter>();
 
+        // 获取注册表中所有的ZuulFilter
         Collection<ZuulFilter> filters = filterRegistry.getAllFilters();
+        // 类型聚合
         for (Iterator<ZuulFilter> iterator = filters.iterator(); iterator.hasNext(); ) {
             ZuulFilter filter = iterator.next();
             if (filter.filterType().equals(filterType)) {
                 list.add(filter);
             }
         }
+        // 排序
         Collections.sort(list); // sort by priority
 
         hashFiltersByType.putIfAbsent(filterType, list);

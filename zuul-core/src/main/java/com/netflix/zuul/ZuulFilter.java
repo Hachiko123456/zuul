@@ -55,6 +55,7 @@ import static org.mockito.Mockito.*;
  */
 public abstract class ZuulFilter implements IZuulFilter, Comparable<ZuulFilter> {
 
+    // 配置文件配置的值
     private final AtomicReference<DynamicBooleanProperty> filterDisabledRef = new AtomicReference<>();
 
     /**
@@ -104,16 +105,21 @@ public abstract class ZuulFilter implements IZuulFilter, Comparable<ZuulFilter> 
     }
 
     /**
+     * 执行过滤器
      * runFilter checks !isFilterDisabled() and shouldFilter(). The run() method is invoked if both are true.
      *
      * @return the return from ZuulFilterResult
      */
     public ZuulFilterResult runFilter() {
+        // 保存最后一个过滤的执行结果
         ZuulFilterResult zr = new ZuulFilterResult();
         if (!isFilterDisabled()) {
             if (shouldFilter()) {
                 Tracer t = TracerFactory.instance().startMicroTracer("ZUUL::" + this.getClass().getSimpleName());
                 try {
+                    /**
+                     * {@link IZuulFilter#run()}
+                     */
                     Object res = run();
                     zr = new ZuulFilterResult(res, ExecutionStatus.SUCCESS);
                 } catch (Throwable e) {

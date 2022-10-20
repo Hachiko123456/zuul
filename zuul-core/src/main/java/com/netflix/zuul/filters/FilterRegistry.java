@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * {@link ZuulFilter}注册表
  * @author mhawthorne
  */
 public class FilterRegistry {
